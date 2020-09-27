@@ -1,0 +1,20 @@
+---
+title: "Hello R Markdown"
+author: "Qiyue Zhang"
+date: 2015-07-23T21:13:14-05:00
+bibliography: "references.bib"
+categories: ["R"]
+tags: ["R Markdown", "plot", "regression"]
+---
+
+Code and data supporting this analysis is available at: "https://github.com/ma521yyy/STA304".
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+
+
+# References
+
+We use `R` [@citeR] and package `tidyverse` [@citetidyverse] to do the analysis.
