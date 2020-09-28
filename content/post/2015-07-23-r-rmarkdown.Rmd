@@ -1,20 +1,192 @@
 ---
-title: "Hello R Markdown"
+title: "Relationship between Household Income and Living Provinces"
 author: "Qiyue Zhang"
-date: 2015-07-23T21:13:14-05:00
+date: "2020-09-27"
 bibliography: "references.bib"
 categories: ["R"]
 tags: ["R Markdown", "plot", "regression"]
 ---
 
-Code and data supporting this analysis is available at: "https://github.com/ma521yyy/STA304".
+# Abstract: 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE)
+We investigated the data collected from the 2019 Canadian Election Study Online Survey. After a series of careful analyses, the results show that provinces with more people living in having a higher and more stable total household income. This is a significant outcome since it can provide suggestions to people who are hesitating about the location for life and work.
+
+```{r setup, include=F}
+knitr::opts_chunk$set(echo=F, warning=F, message=F)
+```
+
+```{R}
+library(tidyverse)
+library(cesR)
+library(knitr)
+library(skimr)
+library(labelled)
+```
+
+# Introduction
+
+Canada is a wealthy country, though salaries are always dependent on the level of skill, location, and job industry. According to the release, the median after-tax income of Canadian families of two or more people was \$71,700. A study found families from four provinces - Ontario, Saskatchewan, Alberta, and British Columbia – had higher median incomes than the Canadian average. Alberta is doing the best with a median family income of \$92,300. Saskatchewan comes in second place with \$77,300, followed by Ontario (\$73,700) and British Columbia ($72,200). Families and individuals in Eastern Canada are earning much less.[@citeearnbyprovinces] Thus, the total amount of household income has a certain association with the living province.
+
+After a preview on 20 interesting variables coming from the sample data collected by the 2019 Canadian Election Study Online Survey, our study on relationship between total household income and currently living province is conducted via two main variables `cps19_income_number` and `cps19_province` through barplots, historgrams, and statistics summaries. As a result, we found that provinces with more people living in having more wealthy families with higher and more stable total household income.
+
+We examined income and provinces from CES 2019 Web data frame and found out that provinces containing more people tend to have more rich families earning a higher and more stable salary. However, we did not consider any other factors that can also potentially lead to the outcome, such as limited resources, members of the family, size of data, or the loss of information caused by removing data. Therefore, we should investigate more potential variables, and find out the most effective method to input the missing values so that we can reduce bias, eventually, making a more rigorous conclusion in the future.
+
+# Data
+
+The 2019 Canadian Election Study - Online Survey was conducted to document the attitudes of Canadians during and after the 2019 election. It continues the tradition of Canadian Election Studies started in 1965. (2020-04-20). 2019 CES Online surveys dataset contains data of this online survey. The online sample for the 2019 Canadian Election Study was composed of a two-wave panel with a modified rolling-cross section during the campaign period and a post-election recontact wave.[@citeSurvey]
+
+```{r, include=T}
+#get data
+get_ces("ces2019_web")
+ces2019_web <- to_factor(ces2019_web)
+
+#select interesting data
+select_dat <- ces2019_web %>% select(cps19_citizenship, cps19_yob, cps19_gender, cps19_province, cps19_education, cps19_demsat, cps19_imp_iss_party, cps19_v_likely, cps19_income_number, cps19_votechoice, cps19_2nd_choice, cps19_fed_gov_sat, cps19_lead_cares_120, cps19_spend_educ, cps19_spend_env, cps19_spend_just_law, cps19_spend_defence, cps19_spend_imm_min, cps19_pos_carbon, cps19_pos_jobs)
+```
+
+From CES 2019 Web data frame, we select 20 variables that we are interested. The table below shows their variable names and the corresponding questions from the survey.
+```{r, echo=FALSE}
+select_table <- data.frame(var = c('cps19_citizenship', 'cps19_yob', 'cps19_gender', 'cps19_province', 'cps19_education', 'cps19_demsat', 'cps19_imp_iss_party', 'cps19_v_likely', 'cps19_income_number', 'cps19_votechoice', 'cps19_2nd_choice', 'cps19_fed_gov_sat','cps19_lead_cares_120', 'cps19_spend_educ', 'cps19_spend_env', 'cps19_spend_just_law', 'cps19_spend_defence', 'cps19_spend_imm_min', 'cps19_pos_carbon', 'cps19_pos_jobs'),
+                          describ = c('Are you a...', 'First, in what year were you born?', 'Are you...', 'Province or territory currently living in', 'Highest level of education completed', 'Satisfaction with the way democracy works in Canada', 'Party best addressing this issue', 'On election day, are you...', ' Total household income, before taxes, for 2018', 'Which party do you think you will vote for', 'And which party would be your second choice', 'Satisfaction with the performance of the federal government', 'Which party leader(s) do you think care(s) about people like you 8', 'How much should the federal government spend on education', 'How much should the federal government spend on the environment', 'How much should the federal government spend on Fieldjustice law', 'How much should the federal government spend on defence', 'How much should the federal government spend on immigrants and minorities', 'To help reduce greenhouse gas emissions...', 'When there is a conflict between protecting the environment and creating jobs...'))
+
+colnames(select_table) <- c("Variables", "Survey Questions")
+kable(select_table, caption="20 Interested Variables and the corresponding Survey Questions from CES 2019 Web Data")
+```
+
+The summary below displays a statistics summary about the 20 selected variables, including the number of observations, number of missing, complete rate, and mean and standard deviation for numeric variables. 
+
+```{r, echo=FALSE}
+skimr::skim(select_dat)
+```
+
+```{r, include=FALSE}
+max_income <- max(select_dat$cps19_income_number, na.rm=T)
+```
+
+```{r}
+max_income
+```
+
+Since we found potential error entries in variable `cps19_income_number`, where a max income of \$`max_income` is impossible to achieve, we only included income values that are less than an \$300,000. This is a reasonable value as the top 1% income required in Canada is just over $191,100.[@citetopIncome]
+
+```{r, include=FALSE}
+clear_select_dat <- select_dat %>% filter(cps19_income_number < 300000)
+```
+
+`cps19_province` and `cps19_income_number` are the variables we are focusing on, and summary statistics of the variables are listed below.
+
+```{r, echo=FALSE}
+summary(clear_select_dat$cps19_income_number)
+```
+
+The minimum value of total household income is $0.
+
+The first quartile of total household income is $42,000.
+
+The median value of total household income is $71,000.
+
+The mean value of total household income is $79,788.
+
+The third quartile of total household income is $105,000.
+
+The max value of total household income is $298,000.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#plot income histogram
+income_hist <-
+  clear_select_dat %>%
+  ggplot(aes(x = cps19_income_number)) +
+  geom_histogram(col="darkorange", fill="yellow", alpha=0.6) +
+  labs(x = "Total Household Income (in CAD)", 
+       y = "Number",
+       title = "Histogram of Total Household Income in 2019 CES",
+       caption = "Source: Stephenson, Harell, Rubenson, Loewen, 2020.") +
+  theme_classic()
+income_hist
+```
+The above graph shows a one mode right skewed histogram containing extremely large values.
+
+A table of provinces across Canada and the corresponding population gathered from 2019 CES is shown below.
+```{r, echo=FALSE}
+table(clear_select_dat$cps19_province)
 ```
 
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#create colors
+c <- rainbow(13)
+c1 <- rainbow(13, alpha=0.4)
+c2 <- rainbow(13, v=0.7)
+
+#plot provinces barplot
+provinc_bar <-
+  clear_select_dat %>%
+  ggplot(aes(x = cps19_province)) +
+  geom_bar(col=c, fill= c1) +
+  labs(x = "Provinces", 
+       y = "Amount of People",
+       title = "Barplot of Provinces in 2019 CES",
+       caption = "Source: Stephenson, Harell, Rubenson, Loewen, 2020.") +
+  theme_classic()
+provinc_bar
+```
+From the above table and barplot, we can see most people live in Ontario and the second-most in Quebec. Alberta and British Columbia have a similar amount of people, nearly 3,000, being the third and the fourth. However, Nunavut has the least amount of people.
+
+
+# Graph
+
+```{r, echo=FALSE}
+#plot boxplot
+boxplot <-
+  clear_select_dat %>%
+  ggplot(aes(x = cps19_province, y = cps19_income_number)) +
+  geom_boxplot(col=c, fill= c1, outlier.colour = 'red', outlier.size = 0.5) +
+  labs(x = "Provinces", 
+       y = "Total Household Income (in CAD)",
+       title = "Boxplot of Total Household Income by Provinces in 2019 CES",
+       caption = "Source: Stephenson, Harell, Rubenson, Loewen, 2020.") +
+  theme_classic()
+boxplot
+```
+
+Supporting by the above side by side boxplots, almost every provinces has a very right skewed distribution of total income that contains extremely large outliers except for Yukon. Prince Edward Island has the lowest median income. Northwest Territories, Nunavut, and Yukon tends to have a larger interquartile range compared to the others. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+sum_tb <- clear_select_dat %>% group_by(cps19_province) %>%
+  summarise(
+    count = n(),
+    mean = mean(cps19_income_number, na.rm = TRUE),
+    median = median(cps19_income_number, na.rm = TRUE),
+    sd = sd(cps19_income_number, na.rm = TRUE),
+    IQR = IQR(cps19_income_number, na.rm = TRUE),
+    range = max(cps19_income_number, na.rm = TRUE) - min(cps19_income_number, na.rm = TRUE),
+    )
+kable(sum_tb, digits=2, caption="Summary Statistics of Total Household Income by Provinces")
+```
+
+# Discussion
+
+From the above side by side boxplots of total household income by provinces, we found the distribution of income is heavily right skewed for all provinces except Yukon, which means almost every province has people with extremely high incomes. Then these wealthy people will affect mean income larger than the median income, which has been proved by the summary statistics above. Moreover, we also found provinces with fewer people have a larger spread of data, such as larger standard deviation, larger interquartile range, and larger range. This interprets the variability of income is higher in small provinces, then the average income of small provinces is not as reliable as large provinces. Furthermore, by comparing the boxplots and statistics summary together, we discovered that small provinces also tend to be much less right skewed than large provinces, and they often contain much less unusually large values than large provinces. On the other hand, we may conclude that provinces with more people living in having more wealthy families with higher and more stable total household income.
+
+## Weaknesses and next steps
+
+Weaknesses and limitations occur since we did not look at or account for other factors that could also potentially lead to the outcome.There are potential lurking variables, such as limited resources, that remote geographic location, and cold natural environment giving no opportunity for people from Nunavut to have more population or make more money. Another limitation is that we do not know the family members within the household that we are testing at. For example, we did not consider the number of family members or their age within the study. Then total household family income may be contributed by any number of people and any age group above the minimum voting age. Then biases occur as more people tend to make more money, and retired seniors do not make money. The different data size coming from the different province is also a weakness itself. As we know, the variability decreases as the sample size increases. So, provinces with more people have a higher chance of being more stable and having a smaller spread of data. Lastly, observations are missing as we removed the unusually large data at the beginning of the analysis. This action may cause a loss of information, eventually, leads to a biased result. Therefore, in order to derive a more rigorous conclusion to the study, in the future, we should investigate more potential variables, and find out the most effective method for imputing missing values so that we can reduce bias and prevent the loss of information.
+
+# Appendix
+
+Code and data supporting this analysis is available at: "https://github.com/ma521yyy/STA304".
+
+We use `R` [@citeR] and packages `tidyverse` [@citetidyverse], `devtools` [@citedevtools], `cesR` [@citecesR], `knitr` [@citeknitr], `visdat` [@citevisdat], and `skimr` [@citeskimr], and `labelled` [@citelabelled] to do the analysis.
 
 # References
 
-We use `R` [@citeR] and package `tidyverse` [@citetidyverse] to do the analysis.
+
+
+
+
+
+
+
+
+
+

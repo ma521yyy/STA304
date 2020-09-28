@@ -6,17 +6,15 @@
     <description>Recent content in Posts on STA304 Assignment - Qiyue Zhang</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 23 Jul 2015 21:13:14 -0500</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 27 Sep 2020 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Hello R Markdown</title>
-      <link>/2015/07/23/hello-r-markdown/</link>
-      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+      <title>Relationship between Household Income and Living Provinces</title>
+      <link>/2020/09/27/relationship-between-household-income-and-living-provinces/</link>
+      <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>/2015/07/23/hello-r-markdown/</guid>
-      <description>Code and data supporting this analysis is available at: “https://github.com/ma521yyy/STA304”.
-References We use R (R Core Team 2020) and package tidyverse (Wickham et al. 2019) to do the analysis.
-R Core Team. 2020. R: A Language and Environment for Statistical Computing. Vienna, Austria: R Foundation for Statistical Computing. https://www.R-project.org/.
- Wickham, Hadley, Mara Averick, Jennifer Bryan, Winston Chang, Lucy D’Agostino McGowan, Romain François, Garrett Grolemund, et al. 2019. “Welcome to the tidyverse.</description>
+      <guid>/2020/09/27/relationship-between-household-income-and-living-provinces/</guid>
+      <description>Abstract: We investigated the data collected from the 2019 Canadian Election Study Online Survey. After a series of careful analyses, the results show that provinces with more people living in having a higher and more stable total household income. This is a significant outcome since it can provide suggestions to people who are hesitating about the location for life and work.
+ Introduction Canada is a wealthy country, though salaries are always dependent on the level of skill, location, and job industry.</description>
     </item>
     
   </channel>
