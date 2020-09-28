@@ -79,19 +79,10 @@ clear_select_dat <- select_dat %>% filter(cps19_income_number < 300000)
 summary(clear_select_dat$cps19_income_number)
 ```
 
-The minimum value of total household income is $0.
-
-The first quartile of total household income is $42,000.
-
-The median value of total household income is $71,000.
-
-The mean value of total household income is $79,788.
-
-The third quartile of total household income is $105,000.
-
-The max value of total household income is $298,000.
+The minimum value of total household income is \$0. The first quartile of total household income is \$42,000. The median value of total household income is \$71,000. The mean value of total household income is \$79,788. The third quartile of total household income is \$105,000. The max value of total household income is \$298,000.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
+options(scipen=999)
 #plot income histogram
 income_hist <-
   clear_select_dat %>%
@@ -101,7 +92,7 @@ income_hist <-
        y = "Number",
        title = "Histogram of Total Household Income in 2019 CES",
        caption = "Source: Stephenson, Harell, Rubenson, Loewen, 2020.") +
-  theme_classic()
+  theme_classic() 
 income_hist
 ```
 The above graph shows a one mode right skewed histogram containing extremely large values.
@@ -127,9 +118,10 @@ provinc_bar <-
        y = "Amount of People",
        title = "Barplot of Provinces in 2019 CES",
        caption = "Source: Stephenson, Harell, Rubenson, Loewen, 2020.") +
-  theme_classic()
+  theme_classic() + theme(axis.text.x = element_text(angle = 90))
 provinc_bar
 ```
+
 From the above table and barplot, we can see most people live in Ontario and the second-most in Quebec. Alberta and British Columbia have a similar amount of people, nearly 3,000, being the third and the fourth. However, Nunavut has the least amount of people.
 
 
@@ -145,7 +137,7 @@ boxplot <-
        y = "Total Household Income (in CAD)",
        title = "Boxplot of Total Household Income by Provinces in 2019 CES",
        caption = "Source: Stephenson, Harell, Rubenson, Loewen, 2020.") +
-  theme_classic()
+  theme_classic() + theme(axis.text.x = element_text(angle = 90))
 boxplot
 ```
 
